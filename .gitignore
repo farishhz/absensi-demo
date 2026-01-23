@@ -1,0 +1,65 @@
+# Database
+db/
+*.db
+*.db-journal
+
+# Development files
+dev.log
+server.log
+
+# Backup files
+*.bak
+page-backup.tsx
+page-mascot.tsx
+
+# Upload folder
+upload/
+
+# Development scripts
+scripts/generate-logo.ts
+
+# Unused components
+src/components/mascot/
+
+# Dependencies
+node_modules
+/.pnp
+.pnp.*
+.yarn/*
+.yarn/integrity
+bower_components
+
+# Testing
+/coverage
+*.log
+
+# Next.js
+.next/
+out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# Typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Local
+local-*
+
+# Vercel
+.vercel

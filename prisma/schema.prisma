@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Model Siswa
+model Siswa {
+  nis           String   @id @unique
+  nama          String
+  kelas         String
+  password      String
+  statusReset   Boolean  @default(false) // false = wajib ganti password, true = aktif
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  absensi       Absensi[]
+  izin          Izin[]
+}
+
+// Model Guru
+model Guru {
+  nip        String   @id @unique
+  nama       String
+  password   String
+  mapel      String?  // Mata pelajaran
+  role       String   @default("GURU") // GURU atau TU
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  izin       Izin[]
+}
+
+// Model Admin
+model Admin {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pengumuman  Pengumuman[]
+  settings    Settings[]
+  logs        Log[]
+}
+
+// Model Absensi
+model Absensi {
+  id          String   @id @default(cuid())
+  nis         String
+  tanggal     String   // Format YYYY-MM-DD
+  jamMasuk    String?  // Format HH:mm:ss
+  jamPulang   String?  // Format HH:mm:ss
+  latitude    Float?
+  longitude   Float?
+  foto        String?  // Path ke file foto
+  status      String   @default("BELUM") // BELUM, HADIR, TERLAMBAT, IZIN, ALPA
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  siswa       Siswa    @relation(fields: [nis], references: [nis], onDelete: Cascade)
+
+  @@index([nis])
+  @@index([tanggal])
+}
+
+// Model Izin
+model Izin {
+  id          String   @id @default(cuid())
+  nis         String?
+  nip         String?
+  tanggal     String   // Format YYYY-MM-DD
+  jenis       String   // SAKIT atau IZIN
+  alasan      String
+  bukti       String?  // Path ke file bukti
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  catatan     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  siswa       Siswa?   @relation(fields: [nis], references: [nis], onDelete: Cascade)
+  guru        Guru?    @relation(fields: [nip], references: [nip], onDelete: Cascade)
+
+  @@index([nis])
+  @@index([nip])
+}
+
+// Model Settings
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  admin       Admin?   @relation(fields: [id], references: [id])
+}
+
+// Model Log Aktivitas
+model Log {
+  id          String   @id @default(cuid())
+  userId      String
+  role        String
+  action      String
+  details     String?
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  admin       Admin?   @relation(fields: [id], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Model Pengumuman
+model Pengumuman {
+  id          String   @id @default(cuid())
+  judul       String
+  isi         String
+  status      String   @default("AKTIF") // AKTIF, NONAKTIF
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  admin       Admin?   @relation(fields: [createdBy], references: [id])
+}
